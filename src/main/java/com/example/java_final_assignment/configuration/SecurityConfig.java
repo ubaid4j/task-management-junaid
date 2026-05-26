@@ -1,5 +1,7 @@
 package com.example.java_final_assignment.configuration;
 
+import com.example.java_final_assignment.filters.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,8 +11,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http
@@ -19,6 +26,12 @@ public class SecurityConfig {
         http
                 // Disable CSRF
                 .csrf(csrf -> csrf.disable())
+                //JWT is Stateless
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+                        )
+                )
 
                 // Configure routes
                 .authorizeHttpRequests(auth -> auth
@@ -32,7 +45,11 @@ public class SecurityConfig {
 
                 .formLogin(form -> form.disable())
 
-                .httpBasic(httpBasic -> httpBasic.disable());
+                .httpBasic(httpBasic -> httpBasic.disable())
+
+                .addFilterBefore(jwtAuthenticationFilter,
+                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }

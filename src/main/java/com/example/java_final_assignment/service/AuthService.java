@@ -12,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     public AppResponse registerUser(RegisterRequestDTO request){
         User user = new User();
@@ -58,7 +60,9 @@ public class AuthService {
                     .getContext()
                     .setAuthentication(authentication);
 
-            return new AppResponse(authentication);
+            String token = jwtService.generateToken(authentication.getName());
+
+            return new AppResponse(token);
         }
         catch(BadCredentialsException e){
             return new AppResponse(401, "Invalid Email or Password");
