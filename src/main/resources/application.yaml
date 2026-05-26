@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: java-final-assignment
+  datasource:
+    url: jdbc:postgresql://localhost:5432/task_management
+    username: postgres
+    password: 05xJunaid
+
+    jpa:
+      hibernate:
+        # Because Liquibase will manage schema.
+        ddl-auto: validate
+      show-sql: true
+
+    liquibase:
+      change-log: classpath:db/changelog/db.changelog-master.yaml

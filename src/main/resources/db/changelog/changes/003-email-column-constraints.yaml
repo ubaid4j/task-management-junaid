@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-email-column-constraints
+      author: Junaid
+
+      changes:
+
+        - addNotNullConstraint:
+            tableName: users
+            columnName: email
+            columnDataType: VARCHAR(255)
+
+        - addUniqueConstraint:
+            tableName: users
+            columnNames: email
+            constraintName: uq_users_email
