@@ -1,4 +1,4 @@
-package com.example.java_final_assignment.auth.requests;
+package com.example.java_final_assignment.controllers.requests;
 
 import lombok.Getter;
 import lombok.Setter;

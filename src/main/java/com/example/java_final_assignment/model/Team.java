@@ -1,21 +1,20 @@
 package com.example.java_final_assignment.model;
 
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "teams")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Team {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,25 +22,16 @@ public class User {
     @Column(nullable = false, unique = true)
     private UUID uuid;
 
-    private String username;
-
-    @Column(unique = true, nullable = false)
-    private String email;
-
-    private String password;
-
-    //Java enum becomes number like (0,1,2), that's why forcing them to store as TEXT
-    @Enumerated(EnumType.STRING)
-    private RoleEnum role;
-
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusEnum status;
+    private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "manager_id", nullable = false)
+    private User manager;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
 
     @PrePersist
     public void prePersist() {

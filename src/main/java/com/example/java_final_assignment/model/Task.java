@@ -6,16 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "tasks")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,20 +25,22 @@ public class User {
     @Column(nullable = false, unique = true)
     private UUID uuid;
 
-    private String username;
+    private String title;
 
-    @Column(unique = true, nullable = false)
-    private String email;
-
-    private String password;
-
-    //Java enum becomes number like (0,1,2), that's why forcing them to store as TEXT
-    @Enumerated(EnumType.STRING)
-    private RoleEnum role;
+    private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StatusEnum status;
+    private TaskStatusEnum status;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User creator;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_to")
+    private User assignee;
+
+    private LocalDate dueDate;
 
     private LocalDateTime createdAt;
 

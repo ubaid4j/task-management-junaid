@@ -1,9 +1,11 @@
 package com.example.java_final_assignment.service;
 
 import com.example.java_final_assignment.GlobalResponse.AppResponse;
-import com.example.java_final_assignment.auth.requests.LoginRequestDTO;
-import com.example.java_final_assignment.auth.requests.RegisterRequestDTO;
-import com.example.java_final_assignment.model.Role;
+import com.example.java_final_assignment.controllers.requests.LoginRequestDTO;
+import com.example.java_final_assignment.controllers.requests.RegisterRequestDTO;
+import com.example.java_final_assignment.exceptions.GlobalException;
+import com.example.java_final_assignment.model.RoleEnum;
+import com.example.java_final_assignment.model.StatusEnum;
 import com.example.java_final_assignment.model.User;
 import com.example.java_final_assignment.repositories.UserRepository;
 import lombok.AllArgsConstructor;
@@ -12,9 +14,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -26,6 +31,12 @@ public class AuthService {
     private final JwtService jwtService;
 
     public AppResponse registerUser(RegisterRequestDTO request){
+
+        Optional<User> alreadyExistUser = userRepository.findByEmail(request.getEmail());
+
+        if(alreadyExistUser.isPresent())
+            throw new GlobalException("Email already exists");
+
         User user = new User();
 
         user.setUsername(request.getUsername());
@@ -38,7 +49,8 @@ public class AuthService {
                 )
         );
 
-        user.setRole(Role.USER);
+        user.setRole(RoleEnum.USER);
+        user.setStatus(StatusEnum.ACTIVE);
 
         User savedUser = userRepository.save(user);
 
@@ -62,10 +74,12 @@ public class AuthService {
 
             String token = jwtService.generateToken(authentication.getName());
 
-            return new AppResponse(token);
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            return new AppResponse(response);
         }
         catch(BadCredentialsException e){
-            return new AppResponse(401, "Invalid Email or Password");
+            throw new GlobalException(401, "Invalid Email or Password");
         }
 
     }

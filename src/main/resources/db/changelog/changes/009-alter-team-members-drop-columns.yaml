@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 009-alter-team-members-drop-columns
+      author: Junaid
+
+      changes:
+
+        # 1. Drop unique constraint first
+        - dropUniqueConstraint:
+            tableName: team_members
+            constraintName: uk_team_members_manager_user
+
+        # 2. Drop foreign keys
+        - dropForeignKeyConstraint:
+            baseTableName: team_members
+            constraintName: fk_team_members_manager
+
+        - dropForeignKeyConstraint:
+            baseTableName: team_members
+            constraintName: fk_team_members_user
+
+        # 3. Drop columns
+        - dropColumn:
+            tableName: team_members
+            columnName: uuid
+
+        - dropColumn:
+            tableName: team_members
+            columnName: manager_id

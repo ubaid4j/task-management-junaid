@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-team-members-table
+      author: Junaid
+
+      changes:
+        - createTable:
+            tableName: team_members
+
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: manager_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+        - addForeignKeyConstraint:
+            baseTableName: team_members
+            baseColumnNames: manager_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_team_members_manager
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: team_members
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_team_members_user
+            onDelete: CASCADE
+
+        - addUniqueConstraint:
+            tableName: team_members
+            columnNames: manager_id, user_id
+            constraintName: uk_team_members_manager_user

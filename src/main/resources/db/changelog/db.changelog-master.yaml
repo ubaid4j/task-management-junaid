@@ -5,3 +5,19 @@ databaseChangeLog:
       file: db/changelog/changes/002-add-password-and-role.yaml
   - include:
       file: db/changelog/changes/003-email-column-constraints.yaml
+  - include:
+      file: db/changelog/changes/004-add-status-column.yaml
+  - include:
+      file: db/changelog/changes/005-add-uuid-and-time-columns.yaml
+  - include:
+      file: db/changelog/changes/006-create-team-members-table.yaml
+  - include:
+      file: db/changelog/changes/007-create-tasks-table.yaml
+  - include:
+      file: db/changelog/changes/008-add-uuid-column-in-team_members-table.yaml
+  - include:
+      file: db/changelog/changes/009-alter-team-members-drop-columns.yaml
+  - include:
+      file: db/changelog/changes/010-create-teams-table.yaml
+  - include:
+      file: db/changelog/changes/011-add-team-id-to-team-members.yaml

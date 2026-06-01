@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-add-uuid-column-in-team_members-table
+      author: Junaid
+
+      changes:
+        - addColumn:
+            tableName: team_members
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: true

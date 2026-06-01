@@ -1,8 +1,8 @@
-package com.example.java_final_assignment.auth;
+package com.example.java_final_assignment.controllers;
 
 import com.example.java_final_assignment.GlobalResponse.AppResponse;
-import com.example.java_final_assignment.auth.requests.LoginRequestDTO;
-import com.example.java_final_assignment.auth.requests.RegisterRequestDTO;
+import com.example.java_final_assignment.controllers.requests.LoginRequestDTO;
+import com.example.java_final_assignment.controllers.requests.RegisterRequestDTO;
 import com.example.java_final_assignment.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
