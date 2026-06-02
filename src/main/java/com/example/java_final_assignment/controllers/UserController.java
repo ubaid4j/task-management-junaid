@@ -11,6 +11,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/*
+ * RESTful Design Issues in This Controller:
+ *
+ * 1. SINGULAR RESOURCE NAME — @RequestMapping("user") should be @RequestMapping("/users").
+ *    REST treats resources as collections; the base path should be the plural noun "/users".
+ *
+ * 2. VERBS IN URLs — REST URLs must be nouns only; HTTP methods convey the action.
+ *    - "create-user"        → POST   /users
+ *    - "restrict-user"      → PATCH  /users/{uuid}   (or PUT with full body)
+ *    - "user-details"       → GET    /users/{uuid}
+ *    - "get-assigned-users" → GET    /users?assignedTo={managerUuid}  (or /managers/{uuid}/users)
+ *    - "get-personal-details" → GET  /users/me
+ *
+ * 3. POST USED FOR READ OPERATIONS — "user-details" and "get-assigned-users" fetch data
+ *    but use POST. Read operations must use GET so they are safe and cacheable (RFC 9110).
+ *
+ * 4. REQUEST BODY FOR RESOURCE IDENTIFICATION — resources should be identified via path
+ *    variables (e.g. /users/{uuid}), not inside a POST body, so the URL itself is addressable.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("user")

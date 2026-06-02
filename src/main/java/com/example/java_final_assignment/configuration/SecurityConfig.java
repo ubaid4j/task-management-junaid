@@ -53,6 +53,12 @@ public class SecurityConfig {
 
                 .httpBasic(httpBasic -> httpBasic.disable())
 
+                // No need to register JwtAuthenticationFilter manually when using
+                // spring-boot-starter-security-oauth2-resource-server.
+                // Replace the two commented lines below with:
+                //   .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                // The resource server registers BearerTokenAuthenticationFilter automatically,
+                // which handles JWT extraction and SecurityContext population.
                 .addFilterBefore(jwtAuthenticationFilter,
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class
                 )

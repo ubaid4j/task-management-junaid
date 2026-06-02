@@ -1,34 +1,47 @@
+server:
+  port: 5101
+
 spring:
   application:
     name: java-final-assignment
   datasource:
-    url: jdbc:postgresql://localhost:5432/task_management
+    url: jdbc:postgresql://localhost:5435/task_management
     username: postgres
     password: 05xJunaid
 
-    jpa:
+  jpa:
+    hibernate:
+      # Because Liquibase will manage schema.
+      ddl-auto: validate
+    properties:
       hibernate:
-        # Because Liquibase will manage schema.
-        ddl-auto: validate
-        # 2. Makes long SQL queries look clean instead of one massive ugly line
+        # Makes long SQL queries readable in logs.
         format_sql: true
-        # 3. Highlights SQL keywords (SELECT, FROM, WHERE) in console color
+        # Highlights SQL keywords in console color.
         highlight_sql: true
-      show-sql: true
+    show-sql: false
+    open-in-view: false
 
-    liquibase:
-      change-log: classpath:db/changelog/db.changelog-master.yaml
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
 
 logging:
   level:
-    org:
-      springframework:
-        web: INFO
-      hibernate:
-        SQL: DEBUG
-        orm:
-          jdbc:
-            bind: TRACE
+    'org.springframework.transaction': DEBUG
+    'org.springframework.transaction.interceptor': TRACE
+    'org.springframework.orm.jpa': DEBUG
+    'org.hibernate': DEBUG
+    'org.hibernate.SQL': DEBUG
+    'org.hibernate.orm.jdbc.bind': TRACE
+    'org.hibernate.orm.jdbc.extract': TRACE
+    'org.hibernate.event.internal': TRACE
+    'org.hibernate.engine.internal': TRACE
+    'org.hibernate.engine.spi.ActionQueue': TRACE
+    'org.hibernate.internal.SessionImpl': TRACE
+    'org.hibernate.internal.SessionFactoryImpl': DEBUG
+    'org.hibernate.resource.jdbc': TRACE
+    'org.hibernate.stat': DEBUG
+    'org.springframework.web': INFO
   pattern:
     # Explicitly including the [TraceID: %X{traceId}] variable in the output structure
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level - [TraceID: %X{traceId}] %logger{36} - %msg%n"

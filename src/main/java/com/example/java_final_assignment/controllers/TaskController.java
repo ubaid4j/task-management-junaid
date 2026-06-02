@@ -10,6 +10,33 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/*
+ * RESTful Design Issues in This Controller:
+ *
+ * 1. SINGULAR RESOURCE NAME — @RequestMapping("task") should be @RequestMapping("/tasks").
+ *    REST treats resources as collections; the base path should be the plural noun "/tasks".
+ *
+ * 2. VERBS IN URLs — REST URLs must be nouns only; HTTP methods convey the action.
+ *    - "create-task"            → POST   /tasks
+ *    - "update-task"            → PUT    /tasks/{uuid}   (full replace) or PATCH (partial)
+ *    - "update-task-status"     → PATCH  /tasks/{uuid}/status
+ *    - "view-team-tasks"        → GET    /tasks?scope=team
+ *    - "view-team-member-tasks" → GET    /tasks?assignee={uuid}
+ *    - "get-personal-tasks"     → GET    /tasks/me
+ *    - "get-specific-task"      → GET    /tasks/{uuid}
+ *    - "get-all-tasks"          → GET    /tasks          (ADMIN sees all; role filter in service)
+ *
+ * 3. POST USED FOR READ OPERATIONS — "view-team-tasks", "view-team-member-tasks",
+ *    "get-personal-tasks", "get-specific-task", and "get-all-tasks" all fetch data
+ *    but use POST. Read operations must use GET so they are safe and cacheable (RFC 9110).
+ *
+ * 4. ROLE-SCOPED VIEWS ON THE SAME RESOURCE — rather than separate endpoints per role,
+ *    a single GET /tasks can return the correct subset based on the caller's role
+ *    (all tasks for ADMIN, team tasks for MANAGER, personal tasks for USER).
+ *    This keeps the URL space clean and the resource model consistent.
+ *
+ * 5. UNUSED IMPORT — UserService is imported and injected but never called in this controller.
+ */
 @RestController
 @RequestMapping("task")
 @RequiredArgsConstructor

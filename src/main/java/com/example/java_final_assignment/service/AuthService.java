@@ -9,6 +9,7 @@ import com.example.java_final_assignment.model.StatusEnum;
 import com.example.java_final_assignment.model.User;
 import com.example.java_final_assignment.repositories.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,9 +50,13 @@ public class AuthService {
                 )
         );
 
+        //accept the role from user
+        //as only ADMIN can create the Users
         user.setRole(RoleEnum.USER);
         user.setStatus(StatusEnum.ACTIVE);
 
+        //the user is proxy object (managed entity), we should avoid to return proxy object
+        //user DTO pattern
         User savedUser = userRepository.save(user);
 
         return new AppResponse(savedUser);
@@ -61,6 +66,9 @@ public class AuthService {
 
         try{
             // This method authenticationManager.authenticate() triggers spring security authentication pipeline.
+            //there is no need to add authentication and set it in SecurityContextHolder
+            //as Spring Security Filters are responsible to do this out of the box
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
@@ -72,7 +80,12 @@ public class AuthService {
                     .getContext()
                     .setAuthentication(authentication);
 
-            String token = jwtService.generateToken(authentication.getName());
+            //here get user from database
+            //check if user exists
+            //check if password hashes matches 
+            //then generate the token            
+
+            String token = jwtService.generateToken(request.getEmail());
 
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
