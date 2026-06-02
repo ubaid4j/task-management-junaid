@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -28,11 +29,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<AppResponse<Void>> handleInvalidRequest(HttpMessageNotReadableException ex) {
 
+        String message = ex.getMessage();
+        Throwable rootCause = ex.getMostSpecificCause();
+
+        if (rootCause instanceof java.time.format.DateTimeParseException) {
+            message = "Enter date in YYYY-MM-DD format";
+        }
+
+
         return ResponseEntity
                 .badRequest()
                 .body(new AppResponse<>(
                         400,
-                        "Bad Request (check Enums or JSON format)"
+                        message
                 ));
     }
 

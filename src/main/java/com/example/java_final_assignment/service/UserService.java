@@ -1,28 +1,29 @@
 package com.example.java_final_assignment.service;
 
 import com.example.java_final_assignment.GlobalResponse.AppResponse;
-import com.example.java_final_assignment.controllers.requests.CreateUserRequest;
-import com.example.java_final_assignment.controllers.requests.GetAssignedUsersResponse;
-import com.example.java_final_assignment.controllers.requests.GetUserDetailsRequest;
-import com.example.java_final_assignment.controllers.requests.RestrictUserRequest;
+import com.example.java_final_assignment.controllers.requests.*;
 import com.example.java_final_assignment.exceptions.GlobalException;
-import com.example.java_final_assignment.model.RoleEnum;
 import com.example.java_final_assignment.model.StatusEnum;
 import com.example.java_final_assignment.model.Team;
 import com.example.java_final_assignment.model.User;
 import com.example.java_final_assignment.repositories.TeamMembersRepository;
 import com.example.java_final_assignment.repositories.TeamRepository;
 import com.example.java_final_assignment.repositories.UserRepository;
+import com.example.java_final_assignment.service.response.CreateUserResponse;
+import com.example.java_final_assignment.service.response.GetAssignedUsersResponse;
 import com.example.java_final_assignment.service.response.GetUserDetailsResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -58,7 +59,15 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        return new AppResponse(savedUser);
+
+        return new AppResponse(
+                new CreateUserResponse(
+                        savedUser.getUuid(),
+                        savedUser.getEmail(),
+                        savedUser.getRole(),
+                        savedUser.getStatus()
+                )
+        );
     }
 
     public AppResponse restrictUser(RestrictUserRequest request){
@@ -89,16 +98,13 @@ public class UserService {
         response.setRole(existedUser.getRole());
         response.setUsername(existedUser.getUsername());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM, yyyy");
-        String formattedDate = existedUser.getCreatedAt()
-                .toLocalDate()
-                .format(formatter);
-        response.setCreatedAt(formattedDate);
+
+        response.setCreatedAt(returnFormattedDate(existedUser.getCreatedAt()));
 
         return new AppResponse(response);
     }
 
-    public AppResponse getAssignedUsers(){
+    public AppResponse getAssignedUsers(GetAssignedUsersRequest request){
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
@@ -122,9 +128,53 @@ public class UserService {
         Team team = teamEntity.get();
 
 
-        List<GetAssignedUsersResponse> teamMembers =  teamMembersRepository.findAssignedUsersByTeamId(team.getId());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<GetAssignedUsersResponse> teamMembers =  teamMembersRepository.findAssignedUsersByTeamId(team.getId(), pageable);
 
-        return new AppResponse(teamMembers);
+        return new AppResponse(teamMembers.getContent());
 
     }
+
+
+    public AppResponse getPersonalDetails(){
+
+        User existedUser = getLoggedInUser();
+
+        GetUserDetailsResponse response = new GetUserDetailsResponse();
+
+        response.setStatus(existedUser.getStatus());
+        response.setEmail(existedUser.getEmail());
+        response.setRole(existedUser.getRole());
+        response.setUsername(existedUser.getUsername());
+        response.setCreatedAt(returnFormattedDate(existedUser.getCreatedAt()));
+
+        return new AppResponse(response);
+    }
+
+    private String returnFormattedDate(LocalDateTime date){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM, yyyy");
+        String formattedDate = date
+                .toLocalDate()
+                .format(formatter);
+
+        return formattedDate;
+    }
+
+    private User getLoggedInUser(){
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        UserDetails userDetails =
+                (UserDetails) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+
+        Optional<User> userEntity = userRepository.findByEmail(email);
+
+        if(userEntity.isEmpty())
+            throw new GlobalException("User not found");
+
+        return userEntity.get();
+    }
+
+
 }

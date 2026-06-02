@@ -10,7 +10,25 @@ spring:
       hibernate:
         # Because Liquibase will manage schema.
         ddl-auto: validate
+        # 2. Makes long SQL queries look clean instead of one massive ugly line
+        format_sql: true
+        # 3. Highlights SQL keywords (SELECT, FROM, WHERE) in console color
+        highlight_sql: true
       show-sql: true
 
     liquibase:
       change-log: classpath:db/changelog/db.changelog-master.yaml
+
+logging:
+  level:
+    org:
+      springframework:
+        web: INFO
+      hibernate:
+        SQL: DEBUG
+        orm:
+          jdbc:
+            bind: TRACE
+  pattern:
+    # Explicitly including the [TraceID: %X{traceId}] variable in the output structure
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level - [TraceID: %X{traceId}] %logger{36} - %msg%n"

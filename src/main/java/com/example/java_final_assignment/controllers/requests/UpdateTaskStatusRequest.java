@@ -1,25 +1,23 @@
 package com.example.java_final_assignment.controllers.requests;
 
 import com.example.java_final_assignment.model.TaskStatusEnum;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.UUID;
-
 
 @Getter
 @Setter
-public class UpdateTaskRequest {
+@AllArgsConstructor
+@RequiredArgsConstructor
+public class UpdateTaskStatusRequest {
 
-    @NotNull(message = "TaskId cannot be null")
+    @NotNull(message = "TaskId can not be null")
     private UUID taskId;
 
-    private LocalDate dueDate;
-    private String title;
-    private String description;
-    private UUID assigneeUuid;
+    @NotNull(message = "Status can not be null")
     private TaskStatusEnum status;
 }

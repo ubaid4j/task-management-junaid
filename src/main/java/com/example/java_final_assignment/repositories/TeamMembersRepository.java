@@ -1,8 +1,10 @@
 package com.example.java_final_assignment.repositories;
 
-import com.example.java_final_assignment.controllers.requests.GetAssignedUsersResponse;
+import com.example.java_final_assignment.service.response.GetAssignedUsersResponse;
 import com.example.java_final_assignment.model.TeamMember;
 import com.example.java_final_assignment.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +21,7 @@ public interface TeamMembersRepository extends JpaRepository<TeamMember, Long> {
     List<User> findUsersByTeamId(@Param("teamId") Long teamId);
 
     @Query("""
-        SELECT new com.example.java_final_assignment.controllers.requests.GetAssignedUsersResponse(
+        SELECT new com.example.java_final_assignment.service.response.GetAssignedUsersResponse(
             tm.user.uuid,
             tm.user.username,
             tm.user.email,
@@ -28,7 +30,22 @@ public interface TeamMembersRepository extends JpaRepository<TeamMember, Long> {
         FROM TeamMember tm
         WHERE tm.team.id = :teamId
     """)
-    List<GetAssignedUsersResponse> findAssignedUsersByTeamId(
-            @Param("teamId") Long teamId
+    Page<GetAssignedUsersResponse> findAssignedUsersByTeamId(
+            @Param("teamId") Long teamId,
+            Pageable pageable
+    );
+
+
+    @Query("SELECT tm.user.id FROM TeamMember tm WHERE tm.team.id = :teamId")
+    List<Long> findUserIdsByTeamId(@Param("teamId") Long teamId);
+
+
+    @Query("""
+        SELECT tm.user.uuid
+        FROM TeamMember tm
+        WHERE tm.user.uuid IN :userUuids
+    """)
+    List<UUID> findUserUuidsAlreadyInAnyTeam(
+            @Param("userUuids") List<UUID> userUuids
     );
 }

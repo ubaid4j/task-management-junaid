@@ -2,9 +2,11 @@ package com.example.java_final_assignment.controllers;
 
 import com.example.java_final_assignment.GlobalResponse.AppResponse;
 import com.example.java_final_assignment.controllers.requests.CreateUserRequest;
+import com.example.java_final_assignment.controllers.requests.GetAssignedUsersRequest;
 import com.example.java_final_assignment.controllers.requests.GetUserDetailsRequest;
 import com.example.java_final_assignment.controllers.requests.RestrictUserRequest;
 import com.example.java_final_assignment.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,14 +33,20 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("user-details")
-    public AppResponse getUserDetails(@RequestBody GetUserDetailsRequest request){
+    public AppResponse getUserDetails(@Valid @RequestBody GetUserDetailsRequest request){
         return userService.getUserDetails(request);
     }
 
     @PreAuthorize("hasRole('MANAGER')")
-    @GetMapping("get-assigned-users")
-    public AppResponse getAssignedUsers(){
-        return userService.getAssignedUsers();
+    @PostMapping("get-assigned-users")
+    public AppResponse getAssignedUsers(@RequestBody GetAssignedUsersRequest request){
+        return userService.getAssignedUsers(request);
+    }
+
+    @PreAuthorize("hasRole('USER') or hasRole('MANAGER') or hasRole('ADMIN')")
+    @GetMapping("get-personal-details")
+    public AppResponse getPersonalDetails(){
+        return userService.getPersonalDetails();
     }
 
 }
